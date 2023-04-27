@@ -1,4 +1,10 @@
 {
+  "data": {
+    "object": {
+      "data": 3
+    },
+    "version": 2
+  },
   "database": {
     "url": "postgres://username:password@localhost/mydatabase"
   },

@@ -4,3 +4,6 @@ security:
   secret_key: "mysecretkey123"
 settings:
   debug: true
+data:
+  version: 2
+  object: '{ "data": 3 }'

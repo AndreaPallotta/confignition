@@ -2,12 +2,13 @@
   "name": "confignition",
   "version": "0.0.1",
   "description": "NPM package to help manage configuration files in NodeJS",
-  "type": "commonjs",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "npx tsc",
-    "start": "node lib/index.js",
-    "test": "node --loader tsx --test src/tests/"
+    "start": "tsc && node lib/index.js",
+    "test": "node --loader tsx --test src/tests/",
+    "test:manual": "npx tsx src/tests/manualTester.ts"
   },
   "repository": {
     "type": "git",
@@ -16,7 +17,11 @@
   "keywords": [
     "config",
     "node",
-    ""
+    "yml",
+    "yaml",
+    "json",
+    "env",
+    "ini"
   ],
   "author": "Andrea Pallotta",
   "license": "ISC",
@@ -26,6 +31,8 @@
   "homepage": "https://github.com/AndreaPallotta/confignition#readme",
   "devDependencies": {
     "@types/node": "^18.16.1",
-    "tsx": "^3.12.6"
+    "ts-node": "^10.9.1",
+    "tsx": "^3.12.6",
+    "typescript": "^5.0.4"
   }
 }
