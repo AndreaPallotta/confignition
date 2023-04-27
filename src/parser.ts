@@ -1,5 +1,6 @@
 import { Config } from "./types";
-import { _getErrMsg, _parseValue } from "./utils";
+import { _getErrMsg, _parseValue, _recursiveJsonParse } from "./utils";
+import YAML from 'yaml';
 
 const _parseDotenv = (content: string) => {
     const lines = content.split('\n');
@@ -22,7 +23,6 @@ const _parseDotenv = (content: string) => {
 
     return config;
 };
-
 const _parseToml = (content: string): Config => {
     const lines = content.split('\n');
 
@@ -74,7 +74,12 @@ const _parseToml = (content: string): Config => {
 
     return config;
 };
-const _parseYaml = (content: string) => { };
+const _parseYaml = (content: string) => {
+    let config: Config = YAML.parse(content);
+    config = _recursiveJsonParse(config);
+
+    return config;
+};
 const _parseJson = (content: string): Config => {
     try {
         return JSON.parse(content) as Config;

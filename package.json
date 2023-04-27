@@ -34,5 +34,8 @@
     "ts-node": "^10.9.1",
     "tsx": "^3.12.6",
     "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "yaml": "^2.2.2"
   }
 }

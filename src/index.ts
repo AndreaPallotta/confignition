@@ -3,7 +3,7 @@ import parser from './parser';
 import { _getConfig, _getErrMsg, _parseFileType } from './utils';
 import { AllowedFileTypes, Config } from './types';
 
-let config: Config;
+let config: Config | null = null;
 
 /**
  *
@@ -30,7 +30,7 @@ export const parse = (file: string, type?: AllowedFileTypes): Config => {
                 break;
             case 'yaml':
             case 'yml':
-                parser.parseYaml(content);
+                config = parser.parseYaml(content);
                 break;
             case 'json':
                 config = parser.parseJson(content);
@@ -51,7 +51,7 @@ export const parse = (file: string, type?: AllowedFileTypes): Config => {
  * If this function is called before the file is parsed, it will return null.
  * @returns {Config} configuration content.
  */
-export const getConfig = (): Config => {
+export const getConfig = (): Config | null => {
     return config;
 }
 

@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { AllowedFileTypes, allowedFileTypes } from './types';
+import { AllowedFileTypes, Config, allowedFileTypes } from './types';
 
 export const _getErrMsg = (e: unknown, defMsg?: string) => {
     if (e instanceof Error) return e.message;
@@ -49,3 +49,32 @@ export const _parseValue = (value: string): any => {
     } catch (e) { }
     return value;
 };
+
+export const _recursiveJsonParse = (config: any): any => {
+  // If the object is an array, recurse on each element
+  if (Array.isArray(config)) {
+    for (let i = 0; i < config.length; i++) {
+      config[i] = _recursiveJsonParse(config[i]);
+    }
+    return config;
+  }
+
+  // If the object is a plain object, recurse on each value
+  if (config && typeof config === 'object') {
+    for (const [key, value] of Object.entries(config)) {
+      config[key] = _recursiveJsonParse(value);
+    }
+    return config;
+  }
+
+  // If the object is a string, try to parse it as JSON
+  if (typeof config === 'string') {
+    try {
+      return JSON.parse(config);
+    } catch (error) {
+      // If there's an error parsing the JSON, return the original string value
+      return config;
+    }
+  }
+  return config;
+}
