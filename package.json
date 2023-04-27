@@ -2,11 +2,11 @@
   "name": "confignition",
   "version": "0.0.1",
   "description": "NPM package to help manage configuration files in NodeJS",
-  "type": "module",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "start": "node index.js",
+    "start": "node lib/index.js",
     "test": "node --loader tsx --test src/tests/"
   },
   "repository": {

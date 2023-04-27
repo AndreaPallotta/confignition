@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
+import parser from './parser';
 
 const _getErrMsg = (e: unknown, defMsg?: string) => {
     if (e instanceof Error) return e.message;
@@ -41,7 +42,7 @@ export interface Config {
 
 let config: Config;
 
-const allowedFileTypes = ['dotenv', 'toml', 'yaml', 'json', 'js', 'ini'] as const;
+const allowedFileTypes = ['dotenv', 'toml', 'yaml', 'yml', 'json', 'ini'] as const;
 
 /**
  * Extensions allowed for configuration file.
@@ -62,7 +63,25 @@ export const parse = (file: string, type?: AllowedFileTypes) => {
 
         const filePath = path.join(path.resolve(path.dirname('')), file);
         const content = _getConfig(filePath);
-        return content;
+
+        switch (type) {
+            case 'dotenv':
+                config = parser.parseDotenv(content);
+                break;
+            case 'toml':
+                parser.parseToml(content);
+                break;
+            case 'yaml':
+            case 'yml':
+                parser.parseYaml(content);
+                break;
+            case 'json':
+                parser.parseJson(content);
+                break;
+            case 'ini':
+                parser.parseIni(content);
+                break;
+        }
     } catch (err) {
         throw new Error(`Error parsing config file: ${_getErrMsg(err)}`);
     }

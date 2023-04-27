@@ -23,6 +23,6 @@ test('Parsing an invalid file path should throw an error', () => {
 
 test('Parsing a valid file path should return the config object', () => {
   assert.doesNotThrow(() => {
-    confignition.parse('src/tests/configs/config.toml');
+    confignition.parse('src/tests/configs/.env');
   });
 });
