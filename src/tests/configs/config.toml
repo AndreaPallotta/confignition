@@ -1,0 +1,8 @@
+[database]
+url = "postgres://username:password@localhost/mydatabase"
+
+[security]
+secret_key = "mysecretkey123"
+
+[settings]
+debug = true
