@@ -1,6 +1,6 @@
 {
   "name": "confignition",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "NPM package to help manage configuration files in NodeJS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
