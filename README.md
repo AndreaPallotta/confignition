@@ -102,7 +102,7 @@ auth = "basic"
     },
     database: {
         url: 'postgres://username:password@localhost/mydatabase',
-        config: {
+        options: {
             https: true,
             auth: 'basic'
         }
@@ -130,7 +130,7 @@ auth = "basic"
     },
     database: {
         url: 'postgres://username:password@localhost/mydatabase',
-        config: {
+        options: {
             https: true,
             auth: 'basic'
         }
@@ -223,9 +223,6 @@ If you have your own template repository, I suggest to clone this tool and chang
 
 ## Show your support
 
-This is my first npm package and I believe there is still
-much to improve.
-<br />
 Give a ⭐️ if you found this tool useful or interesting!
 
 ---
