@@ -2,11 +2,15 @@
   "name": "confignition",
   "version": "0.0.1",
   "description": "NPM package to help manage configuration files in NodeJS",
-  "main": "index.js",
-  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts"
+  ],
   "scripts": {
-    "build": "npx tsc",
-    "start": "tsc && node lib/index.js",
+    "build": "rm -rf dist && npx tsc -p tsconfig.json",
+    "start": "tsc && node dist/index.js",
     "test": "node --loader tsx --test src/tests/",
     "test:manual": "npx tsx src/tests/manualTester.ts",
     "format": "prettier --config .prettierrc src/**/*.ts --write",

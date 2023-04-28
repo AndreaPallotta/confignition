@@ -7,5 +7,5 @@
     "no-console": 1, // Means warning
     "prettier/prettier": 2 // Means error
   },
-  "ignorePatterns": ["**/*.test.js", "**/*.test.ts", "src/tests/manualTester.ts"]
+  "ignorePatterns": ["**/*.js", "**/*.test.ts", "src/tests/manualTester.ts"]
 }

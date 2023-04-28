@@ -1,21 +1,17 @@
 {
   "compilerOptions": {
-    "incremental": true,
-    "target": "es5",
-    "module": "ESNext",
+    "lib": ["es2022"],
+    "target": "es6",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
     "rootDir": "src",
-    "outDir": "lib",
-    "sourceMap": true
+    "outDir": "dist",
+    "declaration": true
   },
-  "include": [
-    "src/**/*.ts",
-    "src/tests/index.test.js",
-    "src/tests/manualTester.ts"
-  ],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.js", "node_modules"]
+  "include": ["src/*.ts"],
+  "exclude": ["tests", "node_modules"]
 }
