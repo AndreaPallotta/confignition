@@ -8,8 +8,13 @@ let config: Config | null = null;
 
 const _defaultConfig: ParseOptions = {
     hotReload: false,
-    hotReloadInterval: undefined,
-    encrypt: undefined,
+    hotReloadInterval: 1000,
+    encryptFields: false,
+    encryptOptions: {
+        fields: [],
+        secret: undefined,
+        secretKey: undefined
+    },
 }
 
 const _reloadConfig = (content: string, type: AllowedFileTypes) => {
@@ -39,7 +44,6 @@ const _watchConfig = (filePath: string, type: AllowedFileTypes, content: string,
     fs.watchFile(filePath, { interval }, (curr: fs.Stats, prev: fs.Stats) => {
         if (curr.mtimeMs !== prev.mtimeMs) {
             _reloadConfig(content, type);
-            console.log(config);
         }
     })
 }

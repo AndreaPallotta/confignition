@@ -11,8 +11,11 @@ export interface Config {
 export interface ParseOptions {
     hotReload?: boolean,
     hotReloadInterval?: number;
-    encrypt?: {
-        fields?: string[]
+    encryptFields?: boolean;
+    encryptOptions?: {
+        fields?: string[],
+        secretKey?: string,
+        secret?: string,
     }
 }
 
