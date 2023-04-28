@@ -75,7 +75,7 @@ import { parse, getConfig } from 'confignition';
 
 ```toml
 [server]
-host = localhost
+host = "localhost"
 port = 5000
 
 [database]
@@ -84,7 +84,7 @@ url = "postgres://username:password@localhost/mydatabase"
 
 [[database.options]]
 https = true
-auth = basic
+auth = "basic"
 ```
 
 ---
