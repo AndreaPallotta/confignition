@@ -1,6 +1,6 @@
 import confignition from '../index';
 
-confignition.parse('src/tests/configs/config.yaml', 'dotenv');
+confignition.parse('src/tests/configs/config.toml', 'toml');
 
 let config = confignition.getConfig();
 

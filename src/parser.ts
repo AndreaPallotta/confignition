@@ -8,7 +8,7 @@ const _parseDotenv = (content: string) => {
     let config: Config = {};
 
     try {
-         for (let i = 0; i < lines.length; i++) {
+        for (let i = 0; i < lines.length; i++) {
             const trimmedLine = lines[i].trim();
 
             // if comment or empty line

@@ -6,6 +6,17 @@ export interface Config {
 }
 
 /**
+ * Interface containing options for the parse() function
+ */
+export interface ParseOptions {
+    hotReload?: boolean,
+    hotReloadInterval?: number;
+    encrypt?: {
+        fields?: string[]
+    }
+}
+
+/**
  * Array of  allowed extensions for the configuration file.
  */
 export const allowedFileTypes = ['dotenv', 'toml', 'yaml', 'yml', 'json', 'ini'] as const;
