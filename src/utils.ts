@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as path from 'path';
 import * as fs from 'fs';
-import { AllowedFileTypes, Config, allowedFileTypes } from './types';
+import { AllowedFileTypes, allowedFileTypes } from './types';
 
 export const _getErrMsg = (e: unknown, defMsg?: string) => {
   if (e instanceof Error) return e.message;
   return defMsg || String(e);
-}
+};
 
 export const _validateFileType = (ext: string): ext is AllowedFileTypes => {
   return allowedFileTypes.includes(ext as AllowedFileTypes);
-}
+};
 
 export const _parseFileType = (file: string): AllowedFileTypes => {
   const fileName = path.basename(file);
@@ -22,7 +24,7 @@ export const _parseFileType = (file: string): AllowedFileTypes => {
   }
 
   return ext as AllowedFileTypes;
-}
+};
 
 export const _getConfig = (filePath: string): string => {
   try {
@@ -46,7 +48,9 @@ export const _parseValue = (value: string): any => {
     if (typeof parsedObject === 'object' && parsedObject !== null) {
       return parsedObject;
     }
-  } catch (e) { }
+  } catch (e) {
+    /* empty */
+  }
   return value;
 };
 
@@ -73,4 +77,17 @@ export const _recursiveJsonParse = (config: any): any => {
     }
   }
   return config;
-}
+};
+
+export const streamToString = async (stream: any) => {
+  return new Promise((resolve: (value: any) => void, reject: (reason?: any) => void) => {
+    const chunks: Buffer[] = [];
+    stream.on('data', (data: any) => {
+      chunks.push(data instanceof Buffer ? data : Buffer.from(data));
+    });
+    stream.on('end', () => {
+      resolve(Buffer.concat(chunks));
+    });
+    stream.on('error', reject);
+  });
+};

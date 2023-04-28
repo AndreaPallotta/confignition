@@ -8,7 +8,9 @@
     "build": "npx tsc",
     "start": "tsc && node lib/index.js",
     "test": "node --loader tsx --test src/tests/",
-    "test:manual": "npx tsx src/tests/manualTester.ts"
+    "test:manual": "npx tsx src/tests/manualTester.ts",
+    "format": "prettier --config .prettierrc src/**/*.ts --write",
+    "lint": "eslint . --ext .ts"
   },
   "repository": {
     "type": "git",
@@ -31,11 +33,19 @@
   "homepage": "https://github.com/AndreaPallotta/confignition#readme",
   "devDependencies": {
     "@types/node": "^18.16.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "eslint": "^8.39.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
     "tsx": "^3.12.6",
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.321.1",
+    "@azure/storage-blob": "^12.14.0",
     "yaml": "^2.2.2"
   }
 }

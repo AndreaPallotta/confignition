@@ -1,7 +1,7 @@
 import confignition from '../index';
 
-confignition.parse('src/tests/configs/config.toml', 'toml');
+confignition.parse('src/tests/configs/config.ini');
 
-let config = confignition.getConfig();
+const config = confignition.getConfig();
 
 console.log(config);

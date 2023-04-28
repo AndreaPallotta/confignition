@@ -34,8 +34,7 @@ test('Parsing an invalid file path should throw an error', () => {
   assert.throws(() => {
     confignition.parse('config.toml', {
       name: 'AssertionError',
-      message:
-        "Error parsing config file: ENOENT: no such file or directory, open 'config.toml'",
+      message: "Error parsing config file: ENOENT: no such file or directory, open 'config.toml'",
     });
   });
 });
