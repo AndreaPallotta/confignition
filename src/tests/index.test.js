@@ -74,3 +74,12 @@ test('Parsing a valid ini file should return the config object', () => {
   const config = confignition.parse(`${configPath}/config.ini`);
   assert.deepStrictEqual(config, configTest);
 });
+
+test('Parsing a valid yaml file should return the config object', () => {
+  assert.doesNotThrow(() => {
+    confignition.parse(`${configPath}/config.yaml`);
+  });
+
+  const config = confignition.parse(`${configPath}/config.yaml`);
+  assert.deepStrictEqual(config, configTest);
+});
