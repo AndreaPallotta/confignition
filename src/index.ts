@@ -39,10 +39,10 @@ const _reloadConfig = (content: string, type: AllowedFileTypes) => {
   }
 };
 
-const _watchConfig = (filePath: string, type: AllowedFileTypes, content: string, interval = 1000) => {
+const _watchConfig = (filePath: string, type: AllowedFileTypes, interval = 1000) => {
   fs.watchFile(filePath, { interval }, (curr: fs.Stats, prev: fs.Stats) => {
     if (curr.mtimeMs !== prev.mtimeMs) {
-      _reloadConfig(content, type);
+      _reloadConfig(_getConfig(filePath), type);
     }
   });
 };
@@ -91,7 +91,7 @@ export const parse = (file: string, type?: AllowedFileTypes, options: ParseOptio
     _reloadConfig(content, type);
 
     if (options.hotReload) {
-      _watchConfig(filePath, type, content, options.hotReloadInterval);
+      _watchConfig(filePath, type, options.hotReloadInterval);
     }
     return config;
   } catch (err) {

@@ -18,7 +18,10 @@
   <img alt="stars" src="https://img.shields.io/github/stars/AndreaPallotta/confignition" />
 </p>
 
-# Confignition
+<div style="display: flex; justify-content: center;">
+  <h1>Confignition</h1>
+  <img alt="Logo" src="logo.svg" style="width: 75px; height: auto; margin-left: 1rem;" />
+</div>
 
 This TypeScript library provides a simple and efficient way to parse different types of config files, including JSON, YAML, INI, .env, and TOML.
 Additionally, it supports retrieving files stored on AWS S3 or Azure Blob.
