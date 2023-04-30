@@ -57,18 +57,17 @@ const _watchConfig = (interval = 1000) => {
 /**
  *
  * @param {string} filePath the path to evaluate.
- * @param {AllowedFileTypes} type the optional file type. If not provided, it will be inferred from the extension.
  * @param {ParseOptions} options options for advanced parsing, such as encryption and cloud.
  * @returns {Config | null} parsed config.
  * @throws {Error} if file extension is not allowed.
  */
-export const parse = (file: string, type?: AllowedFileTypes, options: ParseOptions = _parseOptions): Config | null => {
+export const parse = (file: string, options: ParseOptions = _parseOptions): Config | null => {
   try {
-    if (!type) {
-      type = _parseFileType(file);
+    if (!options.type) {
+      options.type = _parseFileType(file);
     }
 
-    state.type = type;
+    state.type = options.type;
     state.filePath = join(resolve(dirname('')), file);
     let content = '';
 

@@ -95,7 +95,7 @@ auth = "basic"
 - Parse a local file
 
   ```js
-  const config = parse('../config.toml');
+  const config = parse('src/configs/config.toml');
 
   /**
    {
@@ -117,7 +117,7 @@ auth = "basic"
   > NOTE: you can also specify the file type if the extension does not match the file format
 
   ```js
-  const config = parse('../config.txt', 'toml');
+  const config = parse('src/configs/config.txt', { type: 'toml' });
   ```
 
 - Retrieve the parsed configurationn object
@@ -142,7 +142,63 @@ auth = "basic"
    */
   ```
 
+- Update configuration file
+
+  ```js
+  const updatedConfig = update({ newConfig: 'updated' });
+  ```
+
 ---
+
+## Parse configuration
+
+To parse the configuration, you can use the `parse` function. The function accepts 2 arguments:
+
+- The file path - relative to the root directory of the project
+- An object to specify options (optional)
+
+```js
+// The type is inferred
+const config = parse('src/configs/.env');
+
+// or
+
+// The type must be specified because the file extension does not match the format type
+const config = parse('src/config/config.txt', { type: 'dotenv' });
+```
+
+## Dynamically update config file
+
+To update the existing configuration or create a new file and subscribe to it, you can use the `update` function. The function accepts 2 arguments:
+
+- The new configuration object or a callback similar to React's useState hook.
+
+```js
+// Override configuration
+const updatedConfig = update({ override: true });
+
+// or
+
+// Add additional fields to existing configuration
+const updatedConfig = update((prev) => ({
+  ...prev,
+  additionalSection: {
+    updatedConfig: true,
+  },
+}));
+
+// Create a new configuration file and subscribe to it
+const updateConfig = update(
+  { newConfig: true, version: '0.2.0' },
+  {
+    createNewFile: true,
+    newFileOptions: {
+      path: 'src/configs/newConfig.json', // if the file already exists, it will override its content.
+      type: 'json', // optional. Type will be inferred from the file name
+    },
+  }
+);
+```
 
 ## Remote Configurations (STILL IN PROGRESS)
 
@@ -151,7 +207,8 @@ Currently, the library supports retrieving files from AWS S3 Buckets and Azure B
 - AWS:
 
 ```js
-const config = parse('config_on_aws', 'toml', {
+const config = parse('config_on_aws', {
+  type: 'json',
   fromCloud: true,
   cloudConfig: {
     aws: {
@@ -168,7 +225,8 @@ const config = parse('config_on_aws', 'toml', {
 - Azure:
 
 ```js
-const config = parse('config_on_azure', 'toml', {
+const config = parse('config_on_azure', {
+  type: 'ini',
   fromCloud: true,
   cloudConfig: {
     azure: {
@@ -187,7 +245,7 @@ const config = parse('config_on_azure', 'toml', {
 The library supports hot reloading of the config file. Set the `hotReload` to `true`
 
 ```js
-const config = parse('../config.toml', 'toml', {
+const config = parse('../config.toml', {
   hotReload: true,
   hotReloadInterval: 2000, // in ms. Default: 1000ms
 });

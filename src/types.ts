@@ -12,6 +12,7 @@ export interface Config {
  * Interface containing options for the parse() function.
  */
 export interface ParseOptions {
+  type?: AllowedFileTypes;
   fromCloud?: boolean;
   cloudConfig?: ParseCloudOptions;
   hotReload?: boolean;
