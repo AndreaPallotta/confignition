@@ -76,21 +76,19 @@ import { parse, getConfig } from 'confignition';
 
 - For the following example config:
 
-```toml
-[server]
-host = "localhost"
-port = 5000
+  ```toml
+  [server]
+  host = "localhost"
+  port = 5000
 
-[database]
-url = "postgres://username:password@localhost/mydatabase"
+  [database]
+  url = "postgres://username:password@localhost/mydatabase"
 
 
-[[database.options]]
-https = true
-auth = "basic"
-```
-
----
+  [[database.options]]
+  https = true
+  auth = "basic"
+  ```
 
 - Parse a local file
 
@@ -99,17 +97,8 @@ auth = "basic"
 
   /**
    {
-    server: {
-        port: 5000,
-        host: 'localhost',
-    },
-    database: {
-        url: 'postgres://username:password@localhost/mydatabase',
-        options: {
-            https: true,
-            auth: 'basic'
-        }
-    }
+    port: 5000,
+    host: 'localhost',
    }
    */
   ```
@@ -127,17 +116,8 @@ auth = "basic"
 
   /**
    {
-    server: {
-        port: 5000,
-        host: 'localhost',
-    },
-    database: {
-        url: 'postgres://username:password@localhost/mydatabase',
-        options: {
-            https: true,
-            auth: 'basic'
-        }
-    }
+    port: 5000,
+    host: 'localhost',
    }
    */
   ```
@@ -166,6 +146,8 @@ const config = parse('src/configs/.env');
 // The type must be specified because the file extension does not match the format type
 const config = parse('src/config/config.txt', { type: 'dotenv' });
 ```
+
+---
 
 ## Dynamically update config file
 
@@ -199,6 +181,8 @@ const updateConfig = update(
   }
 );
 ```
+
+---
 
 ## Remote Configurations (STILL IN PROGRESS)
 

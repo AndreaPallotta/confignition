@@ -2,7 +2,7 @@ import { join, resolve, dirname } from 'path';
 import { watchFile, Stats } from 'fs';
 import parser from './parser';
 import { _getConfig, _getErrMsg, _parseFileType } from './utils';
-import { AllowedFileTypes, Config, GlobalState, ParseOptions, UpdateOptions } from './types';
+import { Config, GlobalState, ParseOptions, UpdateOptions } from './types';
 import cloud from './cloud';
 import converter from './converter';
 
