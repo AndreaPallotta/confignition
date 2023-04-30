@@ -1,48 +1,55 @@
-import * as path from 'path';
-import * as fs from 'fs';
+import { join, resolve, dirname } from 'path';
+import { watchFile, Stats } from 'fs';
 import parser from './parser';
 import { _getConfig, _getErrMsg, _parseFileType } from './utils';
-import { AllowedFileTypes, Config, ParseOptions } from './types';
+import { AllowedFileTypes, Config, GlobalState, ParseOptions, UpdateOptions } from './types';
 import cloud from './cloud';
+import converter from './converter';
 
-let config: Config | null = null;
+const state: GlobalState = {
+  filePath: '',
+  type: null,
+  config: {},
+};
 
-const _defaultConfig: ParseOptions = {
+const _parseOptions: ParseOptions = {
   fromCloud: false,
   hotReload: false,
   hotReloadInterval: 1000,
   encryptFields: false,
-  encryptOptions: undefined,
-  cloudConfig: undefined,
 };
 
-const _reloadConfig = (content: string, type: AllowedFileTypes) => {
-  switch (type) {
+const _updateOptions: UpdateOptions = {
+  createNewFile: false,
+};
+
+const _reloadConfig = (content: string) => {
+  switch (state.type) {
     case 'dotenv':
-      config = parser.parseDotenv(content);
+      state.config = parser.parseDotenv(content);
       break;
     case 'toml':
-      config = parser.parseToml(content);
+      state.config = parser.parseToml(content);
       break;
     case 'yaml':
     case 'yml':
-      config = parser.parseYaml(content);
+      state.config = parser.parseYaml(content);
       break;
     case 'json':
-      config = parser.parseJson(content);
+      state.config = parser.parseJson(content);
       break;
     case 'ini':
-      config = parser.parseIni(content);
+      state.config = parser.parseIni(content);
       break;
     default:
       throw new Error('unknown file format');
   }
 };
 
-const _watchConfig = (filePath: string, type: AllowedFileTypes, interval = 1000) => {
-  fs.watchFile(filePath, { interval }, (curr: fs.Stats, prev: fs.Stats) => {
+const _watchConfig = (interval = 1000) => {
+  watchFile(state.filePath, { interval }, (curr: Stats, prev: Stats) => {
     if (curr.mtimeMs !== prev.mtimeMs) {
-      _reloadConfig(_getConfig(filePath), type);
+      _reloadConfig(_getConfig(state.filePath));
     }
   });
 };
@@ -52,16 +59,17 @@ const _watchConfig = (filePath: string, type: AllowedFileTypes, interval = 1000)
  * @param {string} filePath the path to evaluate.
  * @param {AllowedFileTypes} type the optional file type. If not provided, it will be inferred from the extension.
  * @param {ParseOptions} options options for advanced parsing, such as encryption and cloud.
- * @returns {Config} parsed config.
+ * @returns {Config | null} parsed config.
  * @throws {Error} if file extension is not allowed.
  */
-export const parse = (file: string, type?: AllowedFileTypes, options: ParseOptions = _defaultConfig): Config | null => {
+export const parse = (file: string, type?: AllowedFileTypes, options: ParseOptions = _parseOptions): Config | null => {
   try {
     if (!type) {
       type = _parseFileType(file);
     }
 
-    const filePath = path.join(path.resolve(path.dirname('')), file);
+    state.type = type;
+    state.filePath = join(resolve(dirname('')), file);
     let content = '';
 
     if (options.cloudConfig?.aws) {
@@ -85,15 +93,15 @@ export const parse = (file: string, type?: AllowedFileTypes, options: ParseOptio
           throw new Error(`Azure Blob request failed - ${_getErrMsg(err)}`);
         });
     } else {
-      content = _getConfig(filePath);
+      content = _getConfig(state.filePath);
     }
 
-    _reloadConfig(content, type);
+    _reloadConfig(content);
 
     if (options.hotReload) {
-      _watchConfig(filePath, type, options.hotReloadInterval);
+      _watchConfig(options.hotReloadInterval);
     }
-    return config;
+    return state.config;
   } catch (err) {
     throw new Error(`Error parsing config file: ${_getErrMsg(err)}`);
   }
@@ -102,15 +110,71 @@ export const parse = (file: string, type?: AllowedFileTypes, options: ParseOptio
 /**
  * Return the parsed configuration.
  * If this function is called before the file is parsed, it will return null.
- * @returns {Config} configuration content.
+ * @returns {Config | null} configuration content.
  */
 export const getConfig = (): Config | null => {
-  return config;
+  return state.config;
+};
+
+/**
+ * Return the global state.
+ * @returns {GlobalState} an object containing the parsed config, file path, and file type.
+ */
+export const getGlobalState = (): GlobalState => {
+  return state;
+};
+
+/**
+ * Function to update the parsed configuration and the config file.
+ * @param {Config | (prev: Config) => void} newConfig the new configuration object or a callback function.
+ * @returns {Config | null} the updated configuration.
+ */
+export const update = (newConfig: Config | ((prev: Config) => void), options: UpdateOptions = _updateOptions): Config | null => {
+  try {
+    if (typeof newConfig === 'function') {
+      state.config = newConfig(state.config);
+    } else {
+      state.config = newConfig;
+    }
+
+    const { createNewFile, newFileOptions } = options;
+
+    if (createNewFile && newFileOptions) {
+      state.filePath = join(resolve(dirname('')), newFileOptions.path);
+      state.type = newFileOptions.type ? newFileOptions.type : _parseFileType(state.filePath);
+    }
+
+    switch (state.type) {
+      case 'dotenv':
+        converter.toEnv(state);
+        break;
+      case 'toml':
+        converter.toToml(state);
+        break;
+      case 'yaml':
+      case 'yml':
+        converter.toYaml(state);
+        break;
+      case 'json':
+        converter.toJson(state);
+        break;
+      case 'ini':
+        converter.toIni(state);
+        break;
+      default:
+        throw new Error('unknown file format');
+    }
+    return getConfig();
+  } catch (err) {
+    throw new Error(`Error updating config: ${_getErrMsg(err)}`);
+  }
 };
 
 const confignition = {
   parse,
+  update,
   getConfig,
+  getGlobalState,
 };
 
 export default confignition;

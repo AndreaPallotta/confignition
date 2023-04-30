@@ -52,3 +52,20 @@ export const allowedFileTypes = ['dotenv', 'toml', 'yaml', 'yml', 'json', 'ini']
  * Type grouping the extensions allowed for the configuration file.
  */
 export type AllowedFileTypes = (typeof allowedFileTypes)[number];
+
+/**
+ * Options to update configurations.
+ */
+export interface UpdateOptions {
+  createNewFile?: boolean;
+  newFileOptions?: {
+    path: string;
+    type?: AllowedFileTypes;
+  };
+}
+
+export interface GlobalState {
+  config: Config;
+  type: AllowedFileTypes | null;
+  filePath: string;
+}
