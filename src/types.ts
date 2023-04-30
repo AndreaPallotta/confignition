@@ -12,6 +12,7 @@ export interface Config {
  * Interface containing options for the parse() function.
  */
 export interface ParseOptions {
+  type?: AllowedFileTypes;
   fromCloud?: boolean;
   cloudConfig?: ParseCloudOptions;
   hotReload?: boolean;
@@ -52,3 +53,20 @@ export const allowedFileTypes = ['dotenv', 'toml', 'yaml', 'yml', 'json', 'ini']
  * Type grouping the extensions allowed for the configuration file.
  */
 export type AllowedFileTypes = (typeof allowedFileTypes)[number];
+
+/**
+ * Options to update configurations.
+ */
+export interface UpdateOptions {
+  createNewFile?: boolean;
+  newFileOptions?: {
+    path: string;
+    type?: AllowedFileTypes;
+  };
+}
+
+export interface GlobalState {
+  config: Config;
+  type: AllowedFileTypes | null;
+  filePath: string;
+}
