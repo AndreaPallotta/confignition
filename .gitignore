@@ -45,6 +45,8 @@ src/tests/manualTester.ts
 node_modules/
 jspm_packages/
 
+.vscode
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 

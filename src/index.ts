@@ -1,8 +1,9 @@
 import { join, resolve, dirname } from 'path';
 import { watchFile, Stats } from 'fs';
-import parser from './parser';
+import { NextFunction, Request, Response } from 'express';
 import { _getConfig, _getErrMsg, _parseFileType } from './utils';
 import { Config, GlobalState, ParseOptions, UpdateOptions } from './types';
+import parser from './parser';
 import cloud from './cloud';
 import converter from './converter';
 
@@ -56,7 +57,7 @@ const _watchConfig = (interval = 1000) => {
 
 /**
  *
- * @param {string} filePath the path to evaluate.
+ * @param {string} file the path to evaluate.
  * @param {ParseOptions} options options for advanced parsing, such as encryption and cloud.
  * @returns {Config | null} parsed config.
  * @throws {Error} if file extension is not allowed.
@@ -169,11 +170,37 @@ export const update = (newConfig: Config | ((prev: Config) => void), options: Up
   }
 };
 
+/**
+ * Express middleware to inject the config inside the request object.
+ * @param {string | undefined} file the path to evaluate.
+ * @param {ParseOptions} options options for advanced parsing, such as encryption and cloud.
+ * @returns {((req: Request & { config: Config | null; }, _: Response, next: NextFunction) => void) | undefined} the Express middleware
+ */
+const expressConfignition = (
+  file?: string,
+  options: ParseOptions = {}
+): ((req: Request & { config: Config | null }, _: Response, next: NextFunction) => void) | undefined => {
+  try {
+    return (req: Request & { config: Config | null }, _: Response, next: NextFunction) => {
+      if (file) {
+        const parsedConfig = parse(file, options);
+        req.config = parsedConfig;
+      } else if (state.config) {
+        req.config = getConfig();
+      }
+      return next();
+    };
+  } catch (err) {
+    return;
+  }
+};
+
 const confignition = {
   parse,
   update,
   getConfig,
   getGlobalState,
+  expressConfignition,
 };
 
 export default confignition;

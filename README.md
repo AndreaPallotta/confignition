@@ -239,6 +239,43 @@ const config = parse('../config.toml', {
 
 ---
 
+## Express Integration
+
+A middleware is available for integration with the Express framework. The middleware injects the existing configuration or parsed a new one (if the filepath is specified) into the request object.
+
+```js
+import * as express from 'express';
+import { expressConfignition } from 'confignition';
+const app = express();
+
+app.use(expressConfignition('src/configs/config.ini'));
+
+app.get('/', (req, res) => {
+  const { config, params } = req;
+  // ...
+});
+```
+
+or
+
+```js
+import * as express from 'express';
+import { parse, expressConfignition } from 'confignition';
+
+parse('src/configs/config.yaml');
+
+const app = express();
+
+app.use(expressConfignition);
+
+app.get('/', (req, res) => {
+  const { config, params } = req;
+  // ...
+});
+```
+
+---
+
 ## Encryption (Coming Soon)
 
 In a future release, the library will support encryption of the config files (or part of them). This will allow you to store sensitive information such as API keys, passwords, and tokens securely.
