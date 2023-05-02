@@ -79,7 +79,6 @@ const _watchConfig = (interval = 1000, fromEnv?: boolean | string[]) => {
 export const parse = (file: string, options: ParseOptions = _parseOptions): Config | null => {
   try {
     if (!options.type) {
-      console.log('here', file);
       options.type = _parseFileType(file);
     }
 
