@@ -266,7 +266,7 @@ parse('src/configs/config.yaml');
 
 const app = express();
 
-app.use(expressConfignition);
+app.use(expressConfignition());
 
 app.get('/', (req, res) => {
   const { config, params } = req;

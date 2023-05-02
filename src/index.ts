@@ -174,14 +174,14 @@ export const update = (newConfig: Config | ((prev: Config) => void), options: Up
  * Express middleware to inject the config inside the request object.
  * @param {string | undefined} file the path to evaluate.
  * @param {ParseOptions} options options for advanced parsing, such as encryption and cloud.
- * @returns {((req: Request & { config: Config | null; }, _: Response, next: NextFunction) => void) | undefined} the Express middleware
+ * @returns {((req: Request & { config: Config | null; }, _: Response, next: NextFunction) => void)} the Express middleware
  */
-const expressConfignition = (
+export const expressConfignition = (
   file?: string,
   options: ParseOptions = {}
-): ((req: Request & { config: Config | null }, _: Response, next: NextFunction) => void) | undefined => {
-  try {
-    return (req: Request & { config: Config | null }, _: Response, next: NextFunction) => {
+): ((req: Request & { config: Config | null }, _: Response, next: NextFunction) => void) => {
+  return (req: Request & { config: Config | null }, _: Response, next: NextFunction) => {
+    try {
       if (file) {
         const parsedConfig = parse(file, options);
         req.config = parsedConfig;
@@ -189,10 +189,10 @@ const expressConfignition = (
         req.config = getConfig();
       }
       return next();
-    };
-  } catch (err) {
-    return;
-  }
+    } catch (err) {
+      return next();
+    }
+  };
 };
 
 const confignition = {
