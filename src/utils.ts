@@ -10,7 +10,7 @@ export const _getErrMsg = (e: unknown, defMsg?: string) => {
 };
 
 export const _validateFileType = (ext: string): ext is AllowedFileTypes => {
-  return allowedFileTypes.includes(ext as AllowedFileTypes);
+  return allowedFileTypes.includes(ext as any);
 };
 
 export const _parseFileType = (file: string): AllowedFileTypes => {

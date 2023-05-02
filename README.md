@@ -139,6 +139,7 @@ To parse the configuration, you can use the `parse` function. The function accep
 
 ```js
 // The type is inferred
+import { parse } from 'confignition';
 const config = parse('src/configs/.env');
 
 // or
@@ -148,6 +149,24 @@ const config = parse('src/config/config.txt', { type: 'dotenv' });
 ```
 
 ---
+
+## Custom parsing
+
+In additional to the parsing algorithms provided, you can write your own. Especially useful if the config format is not currently supported or requires extra steps.
+
+```js
+import { customParse } from 'confignition';
+
+const config = customParse(
+  'src/config/config.cfg',
+  (content) => {
+    let conf;
+    // ...parsing logic
+    return conf;
+  },
+  { type: 'cfg' } // the type is required as it is not inferred.
+);
+```
 
 ## Dynamically update config file
 

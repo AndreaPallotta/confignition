@@ -1,8 +1,8 @@
 import { join, resolve, dirname } from 'path';
-import { watchFile, Stats } from 'fs';
+import { watchFile, Stats, readFileSync } from 'fs';
 import { NextFunction, Request, Response } from 'express';
 import { _getConfig, _getErrMsg, _parseFileType } from './utils';
-import { Config, GlobalState, ParseOptions, UpdateOptions } from './types';
+import { AllowedFileTypes, Config, GlobalState, ParseOptions, UpdateOptions } from './types';
 import parser from './parser';
 import cloud from './cloud';
 import converter from './converter';
@@ -56,9 +56,9 @@ const _watchConfig = (interval = 1000) => {
 };
 
 /**
- *
+ * Function to parse a local or remote configuration file with different options.
  * @param {string} file the path to evaluate.
- * @param {ParseOptions} options options for advanced parsing, such as encryption and cloud.
+ * @param {ParseOptions} options options for advanced parsing, such as cloud configs.
  * @returns {Config | null} parsed config.
  * @throws {Error} if file extension is not allowed.
  */
@@ -104,6 +104,34 @@ export const parse = (file: string, options: ParseOptions = _parseOptions): Conf
     return state.config;
   } catch (err) {
     throw new Error(`Error parsing config file: ${_getErrMsg(err)}`);
+  }
+};
+
+/**
+ * Function to parse a configuration file with a custom parser.
+ * @param {string} file the path to evaluate.
+ * @param {(content: string) => Config | undefined} parser the custom parser. The content of the file is passed as a parameter.
+ * @param {ParseOptions & { type: AllowedFileTypes }} options options for advanced parsing, such as cloud configs.
+ * @throws {Error} if file extension is not specified or the parsing fails.
+ */
+export const customParse = (file: string, parser: (content: string) => Config | undefined, options: ParseOptions & { type: AllowedFileTypes }) => {
+  try {
+    if (!options.type) {
+      throw new Error('type not specified');
+    }
+    const filePath = join(resolve(dirname('')), file);
+    const content = readFileSync(filePath, 'utf8');
+    const parsedConfig = parser(content);
+
+    if (parsedConfig) {
+      state.filePath = filePath;
+      state.type = options.type;
+      state.config = parsedConfig;
+    }
+
+    return state.config;
+  } catch (err) {
+    throw new Error(`Error parsing custom config file: ${_getErrMsg(err)}`);
   }
 };
 
@@ -201,6 +229,7 @@ const confignition = {
   getConfig,
   getGlobalState,
   expressConfignition,
+  customParse,
 };
 
 export default confignition;
