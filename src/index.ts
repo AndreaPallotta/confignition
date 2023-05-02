@@ -24,7 +24,7 @@ const _updateOptions: UpdateOptions = {
   createNewFile: false,
 };
 
-const _reloadConfig = (content: string) => {
+const _reloadConfig = (content: string, fromEnv?: boolean | string[]) => {
   switch (state.type) {
     case 'dotenv':
       state.config = parser.parseDotenv(content);
@@ -45,12 +45,26 @@ const _reloadConfig = (content: string) => {
     default:
       throw new Error('unknown file format');
   }
+
+  if (Array.isArray(fromEnv)) {
+    for (const key of fromEnv) {
+      const value = process.env[key];
+      if (value) {
+        state.config[key] = value;
+      }
+    }
+  } else if (fromEnv === true) {
+    state.config = {
+      ...state.config,
+      ...process.env,
+    };
+  }
 };
 
-const _watchConfig = (interval = 1000) => {
+const _watchConfig = (interval = 1000, fromEnv?: boolean | string[]) => {
   watchFile(state.filePath, { interval }, (curr: Stats, prev: Stats) => {
     if (curr.mtimeMs !== prev.mtimeMs) {
-      _reloadConfig(_getConfig(state.filePath));
+      _reloadConfig(_getConfig(state.filePath), fromEnv);
     }
   });
 };
@@ -96,10 +110,10 @@ export const parse = (file: string, options: ParseOptions = _parseOptions): Conf
       content = _getConfig(state.filePath);
     }
 
-    _reloadConfig(content);
+    _reloadConfig(content, options.fromEnv);
 
     if (options.hotReload) {
-      _watchConfig(options.hotReloadInterval);
+      _watchConfig(options.hotReloadInterval, options.fromEnv);
     }
     return state.config;
   } catch (err) {
@@ -110,13 +124,13 @@ export const parse = (file: string, options: ParseOptions = _parseOptions): Conf
 /**
  * Function to parse a configuration file with a custom parser.
  * @param {string} file the path to evaluate.
+ * @param {AllowedFileTypes} type the config file format.
  * @param {(content: string) => Config | undefined} parser the custom parser. The content of the file is passed as a parameter.
- * @param {ParseOptions & { type: AllowedFileTypes }} options options for advanced parsing, such as cloud configs.
  * @throws {Error} if file extension is not specified or the parsing fails.
  */
-export const customParse = (file: string, parser: (content: string) => Config | undefined, options: ParseOptions & { type: AllowedFileTypes }) => {
+export const customParse = (file: string, type: AllowedFileTypes, parser: (content: string) => Config | undefined) => {
   try {
-    if (!options.type) {
+    if (!type) {
       throw new Error('type not specified');
     }
     const filePath = join(resolve(dirname('')), file);
@@ -125,7 +139,7 @@ export const customParse = (file: string, parser: (content: string) => Config | 
 
     if (parsedConfig) {
       state.filePath = filePath;
-      state.type = options.type;
+      state.type = type;
       state.config = parsedConfig;
     }
 

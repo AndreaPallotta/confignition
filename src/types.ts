@@ -17,6 +17,7 @@ export interface ParseOptions {
   cloudConfig?: ParseCloudOptions;
   hotReload?: boolean;
   hotReloadInterval?: number;
+  fromEnv?: boolean | string[];
   encryptFields?: boolean;
   encryptOptions?: ParseEncryptionOptions;
 }
@@ -65,6 +66,9 @@ export interface UpdateOptions {
   };
 }
 
+/**
+ * Interface describing the global state
+ */
 export interface GlobalState {
   config: Config;
   type: AllowedFileTypes | null;

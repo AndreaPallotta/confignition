@@ -130,7 +130,7 @@ import { parse, getConfig } from 'confignition';
 
 ---
 
-## Parse configuration
+## Parse Configuration
 
 To parse the configuration, you can use the `parse` function. The function accepts 2 arguments:
 
@@ -150,25 +150,38 @@ const config = parse('src/config/config.txt', { type: 'dotenv' });
 
 ---
 
-## Custom parsing
+## Custom Parsing
 
 In additional to the parsing algorithms provided, you can write your own. Especially useful if the config format is not currently supported or requires extra steps.
 
 ```js
 import { customParse } from 'confignition';
 
-const config = customParse(
-  'src/config/config.cfg',
-  (content) => {
-    let conf;
-    // ...parsing logic
-    return conf;
-  },
-  { type: 'cfg' } // the type is required as it is not inferred.
-);
+const config = customParse('src/config/config.cfg', 'cfg', (content) => {
+  let conf;
+  // ...parsing logic
+  return conf;
+});
 ```
 
-## Dynamically update config file
+> NOTE: Currently, all options available for the default config (hot reload, remote config) are not available for the custom parsing.
+
+---
+
+## Include Environment Variables
+
+If there are environment variables not included in the configuration file, you can use the `fromEnv` option.
+It accepts either a boolean (to load ALL environment variables) or an array (case-sensitive) to specify which environment variables to load.
+
+```js
+const config = parse('src/config/config.yaml', { fromEnv: true }); // load all variables
+
+const config = parse('src/config/config.toml', { fromEnv: ['NODE_ENV'] }); // only load specific fields (case-sensitive)
+```
+
+---
+
+## Update Config File
 
 To update the existing configuration or create a new file and subscribe to it, you can use the `update` function. The function accepts 2 arguments:
 
@@ -203,7 +216,7 @@ const updateConfig = update(
 
 ---
 
-## Remote Configurations (STILL IN PROGRESS)
+## Load Remote Configurations
 
 Currently, the library supports retrieving files from AWS S3 Buckets and Azure Blob Storages. Pass the remote file name as the file path and add the configurations needed to access the remote storage.
 
@@ -289,7 +302,7 @@ app.use(expressConfignition());
 
 app.get('/', (req, res) => {
   const { config, params } = req;
-  // ...
+  // the rest of the request.
 });
 ```
 
