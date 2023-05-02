@@ -24,7 +24,7 @@ const _parseDotenv = (content: string) => {
     }
     return config;
   } catch (err) {
-    throw new Error(`parsed failed (.env): ${_getErrMsg(err)}`);
+    throw new Error(`parse failed (.env): ${_getErrMsg(err)}`);
   }
 };
 const _parseToml = (content: string): Config => {
@@ -79,7 +79,7 @@ const _parseToml = (content: string): Config => {
 
     return config;
   } catch (err) {
-    throw new Error(`parsed failed (TOML): ${_getErrMsg(err)}`);
+    throw new Error(`parse failed (TOML): ${_getErrMsg(err)}`);
   }
 };
 const _parseYaml = (content: string) => {
@@ -88,14 +88,14 @@ const _parseYaml = (content: string) => {
     config = _recursiveJsonParse(config);
     return config;
   } catch (err) {
-    throw new Error(`parsed failed (yaml): ${_getErrMsg(err)}`);
+    throw new Error(`parse failed (yaml): ${_getErrMsg(err)}`);
   }
 };
 const _parseJson = (content: string): Config => {
   try {
     return JSON.parse(content) as Config;
   } catch (err: unknown) {
-    throw new Error(`parsed failed (JSON): ${_getErrMsg(err)}`);
+    throw new Error(`parse failed (JSON): ${_getErrMsg(err)}`);
   }
 };
 const _parseIni = (content: string): Config => {
@@ -128,7 +128,7 @@ const _parseIni = (content: string): Config => {
 
     return config;
   } catch (err) {
-    throw new Error(`parsed failed (yaml): ${_getErrMsg(err)}`);
+    throw new Error(`parse failed (ini): ${_getErrMsg(err)}`);
   }
 };
 

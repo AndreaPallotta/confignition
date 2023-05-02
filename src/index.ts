@@ -7,7 +7,7 @@ import parser from './parser';
 import cloud from './cloud';
 import converter from './converter';
 
-const state: GlobalState = {
+let state: GlobalState = {
   filePath: '',
   type: null,
   config: {},
@@ -79,6 +79,7 @@ const _watchConfig = (interval = 1000, fromEnv?: boolean | string[]) => {
 export const parse = (file: string, options: ParseOptions = _parseOptions): Config | null => {
   try {
     if (!options.type) {
+      console.log('here', file);
       options.type = _parseFileType(file);
     }
 
@@ -128,7 +129,7 @@ export const parse = (file: string, options: ParseOptions = _parseOptions): Conf
  * @param {(content: string) => Config | undefined} parser the custom parser. The content of the file is passed as a parameter.
  * @throws {Error} if file extension is not specified or the parsing fails.
  */
-export const customParse = (file: string, type: AllowedFileTypes, parser: (content: string) => Config | undefined) => {
+export const customParse = (file: string, type: AllowedFileTypes | string, parser: (content: string) => Config | undefined) => {
   try {
     if (!type) {
       throw new Error('type not specified');
@@ -139,7 +140,7 @@ export const customParse = (file: string, type: AllowedFileTypes, parser: (conte
 
     if (parsedConfig) {
       state.filePath = filePath;
-      state.type = type;
+      state.type = type as AllowedFileTypes;
       state.config = parsedConfig;
     }
 
@@ -166,6 +167,16 @@ export const getGlobalState = (): GlobalState => {
   return state;
 };
 
+/**
+ * Reset the global state to its initial value.
+ */
+export const resetGlobalState = () => {
+  state = {
+    filePath: '',
+    type: null,
+    config: {},
+  };
+};
 /**
  * Function to update the parsed configuration and the config file.
  * @param {Config | (prev: Config) => void} newConfig the new configuration object or a callback function.
@@ -244,6 +255,7 @@ const confignition = {
   getGlobalState,
   expressConfignition,
   customParse,
+  resetGlobalState,
 };
 
 export default confignition;

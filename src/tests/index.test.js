@@ -1,6 +1,7 @@
 import assert from 'node:assert';
-import test, { after, describe } from 'node:test';
-import confignition from '../index';
+import test, { after, afterEach, describe } from 'node:test';
+import confignition, { resetGlobalState } from '../index';
+import parser from '../parser';
 
 const dotenvConfigTest = {
   DATABASE_URL: 'postgres://username:password@localhost/mydatabase',
@@ -29,7 +30,13 @@ const parseExecTime = (hrtime, format = 1e6) => {
 
 describe('Parsing tests', () => {
   after(() => {
-    console.table(times);
+    if (Object.keys(times).length !== 0) {
+      console.table(times);
+    }
+  });
+
+  afterEach(() => {
+    resetGlobalState();
   });
 
   test('Parsing an invalid file type should throw an error', () => {
@@ -52,11 +59,11 @@ describe('Parsing tests', () => {
 
   test('Parsing a valid .env should return the config object', () => {
     assert.doesNotThrow(() => {
-      confignition.parse(`${configPath}/.env`);
+      confignition.parse(`${configPath}/.env`, { type: 'dotenv' });
     });
 
     const start = process.hrtime();
-    const config = confignition.parse(`${configPath}/.env`);
+    const config = confignition.parse(`${configPath}/.env`, { type: 'dotenv' });
     const elapse = parseExecTime(process.hrtime(start));
 
     times.dotenv = { elapse };
@@ -66,11 +73,11 @@ describe('Parsing tests', () => {
 
   test('Parsing a valid json file should return the config object', () => {
     assert.doesNotThrow(() => {
-      confignition.parse(`${configPath}/config.json`);
+      confignition.parse(`${configPath}/config.json`, { type: 'json' });
     });
 
     const start = process.hrtime();
-    const config = confignition.parse(`${configPath}/config.json`);
+    const config = confignition.parse(`${configPath}/config.json`, { type: 'json' });
     const elapse = parseExecTime(process.hrtime(start));
 
     times.json = { elapse };
@@ -80,11 +87,11 @@ describe('Parsing tests', () => {
 
   test('Parsing a valid toml file should return the config object', () => {
     assert.doesNotThrow(() => {
-      confignition.parse(`${configPath}/config.toml`);
+      confignition.parse(`${configPath}/config.toml`, { type: 'toml' });
     });
 
     const start = process.hrtime();
-    const config = confignition.parse(`${configPath}/config.toml`);
+    const config = confignition.parse(`${configPath}/config.toml`, { type: 'toml' });
     const elapse = parseExecTime(process.hrtime(start));
 
     times.toml = { elapse };
@@ -94,11 +101,11 @@ describe('Parsing tests', () => {
 
   test('Parsing a valid ini file should return the config object', () => {
     assert.doesNotThrow(() => {
-      confignition.parse(`${configPath}/config.ini`);
+      confignition.parse(`${configPath}/config.ini`, { type: 'ini' });
     });
 
     const start = process.hrtime();
-    const config = confignition.parse(`${configPath}/config.ini`);
+    const config = confignition.parse(`${configPath}/config.ini`, { type: 'ini' });
     const elapse = parseExecTime(process.hrtime(start));
 
     times.ini = { elapse };
@@ -108,15 +115,29 @@ describe('Parsing tests', () => {
 
   test('Parsing a valid yaml file should return the config object', () => {
     assert.doesNotThrow(() => {
-      confignition.parse(`${configPath}/config.yaml`);
+      confignition.parse(`${configPath}/config.yaml`, { type: 'yaml' });
     });
 
     const start = process.hrtime();
-    const config = confignition.parse(`${configPath}/config.yaml`);
+    const config = confignition.parse(`${configPath}/config.yaml`, { type: 'yaml' });
     const elapse = parseExecTime(process.hrtime(start));
 
     times.yaml = { elapse };
     assert.deepStrictEqual(config, configTest);
     assert.ok(elapse < 100);
+  });
+
+  test('Parsing a valid file with a custom parser should return the config object', () => {
+    assert.doesNotThrow(() => {
+      confignition.customParse(`${configPath}/.env`, 'dotenv', parser.parseDotenv);
+    });
+
+    const start = process.hrtime();
+    const config = confignition.customParse(`${configPath}/.env`, 'dotenv', parser.parseDotenv);
+    const elapse = parseExecTime(process.hrtime(start));
+
+    times.customParse = { elapse };
+    assert.deepStrictEqual(config, dotenvConfigTest);
+    assert.ok(elapse < 0.5);
   });
 });
