@@ -1,38 +1,46 @@
-import { S3Client, GetObjectCommand, S3ClientConfig } from '@aws-sdk/client-s3';
-import { BlobServiceClient, BlobDownloadResponseParsed } from '@azure/storage-blob';
-import { streamToString } from './utils';
+import { S3Client, GetObjectCommand, type S3ClientConfig } from '@aws-sdk/client-s3';
+import { BlobServiceClient } from '@azure/storage-blob';
 
-const _createS3Client = (config: S3ClientConfig): S3Client => {
-  const client = new S3Client(config);
-  return client;
-};
+// ─── AWS S3 ───────────────────────────────────────────────────────────────────
 
-const _getConfigFromS3Bucket = async (bucket: string, fileName: string, awsConfig: S3ClientConfig): Promise<string> => {
-  const client = _createS3Client(awsConfig);
-  const command = new GetObjectCommand({
-    Bucket: bucket,
-    Key: fileName,
-  });
-
+const _getConfigFromS3 = async (
+  bucket: string,
+  fileName: string,
+  awsConfig: S3ClientConfig
+): Promise<string> => {
+  const client = new S3Client(awsConfig);
+  const command = new GetObjectCommand({ Bucket: bucket, Key: fileName });
   const res = await client.send(command);
-  const config = await res.Body?.transformToString();
-  return config || '';
+  return (await res.Body?.transformToString()) ?? '';
 };
 
-const _getConfigFromAzureBlob = async (connection: string, containerName: string, fileName: string): Promise<string> => {
+// ─── Azure Blob ───────────────────────────────────────────────────────────────
+
+const _getConfigFromAzure = async (
+  connection: string,
+  containerName: string,
+  fileName: string
+): Promise<string> => {
   const serviceClient = BlobServiceClient.fromConnectionString(connection);
   const containerClient = serviceClient.getContainerClient(containerName);
   const blobClient = containerClient.getBlobClient(fileName);
+  const res = await blobClient.download();
 
-  const res: BlobDownloadResponseParsed = await blobClient.download();
-  const content: string = (await streamToString(res.readableStreamBody)).toString();
+  if (!res.readableStreamBody) return '';
 
-  return content;
+  // Consume the stream using Node's async iterator (no manual buffer concat)
+  const chunks: Buffer[] = [];
+  for await (const chunk of res.readableStreamBody as AsyncIterable<Buffer>) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk as ArrayBuffer));
+  }
+  return Buffer.concat(chunks).toString('utf8');
 };
 
+// ─── Exports ──────────────────────────────────────────────────────────────────
+
 const cloud = {
-  getConfigFromS3: _getConfigFromS3Bucket,
-  getConfigFromAzure: _getConfigFromAzureBlob,
+  getConfigFromS3: _getConfigFromS3,
+  getConfigFromAzure: _getConfigFromAzure,
 };
 
 export default cloud;

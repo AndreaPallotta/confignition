@@ -1,24 +1,45 @@
 {
   "name": "confignition",
-  "version": "0.7.0",
-  "description": "NPM package to help manage configuration files in NodeJS",
-  "main": "dist/index.js",
+  "version": "1.0.0",
+  "description": "A modern TypeScript library to parse, watch, and write configuration files (JSON, YAML, TOML, INI, .env) with optional AWS S3 / Azure Blob cloud support, hot reload, field-level encryption, and an Express middleware.",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
   "files": [
     "dist/**/*.js",
-    "dist/**/*.d.ts"
+    "dist/**/*.cjs",
+    "dist/**/*.mjs",
+    "dist/**/*.d.ts",
+    "dist/**/*.d.cts"
   ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "build": "rm -rf dist && npx tsc -p tsconfig.json",
-    "start": "tsc && node dist/index.js",
-    "test": "node --loader tsx --test src/tests/",
-    "test:manual": "npx tsx src/tests/manualTester.ts",
-    "format": "prettier --config .prettierrc src/**/*.ts --write",
-    "lint": "eslint . --ext .ts",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "start": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint src",
     "version:patch": "npm version patch",
     "version:minor": "npm version minor",
-    "version:major": "npm version patch",
-    "publish": "npm publish"
+    "version:major": "npm version major",
+    "prepublishOnly": "npm run typecheck && npm run build"
   },
   "repository": {
     "type": "git",
@@ -26,12 +47,20 @@
   },
   "keywords": [
     "config",
+    "configuration",
     "node",
     "yml",
     "yaml",
     "json",
+    "toml",
     "env",
-    "ini"
+    "dotenv",
+    "ini",
+    "hot-reload",
+    "encryption",
+    "aws",
+    "azure",
+    "s3"
   ],
   "author": "Andrea Pallotta",
   "license": "MIT",
@@ -39,22 +68,31 @@
     "url": "https://github.com/AndreaPallotta/confignition/issues"
   },
   "homepage": "https://github.com/AndreaPallotta/confignition#readme",
+  "peerDependencies": {
+    "express": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/express": "^4.17.17",
-    "@types/node": "^18.16.1",
-    "@typescript-eslint/eslint-plugin": "^5.59.1",
-    "@typescript-eslint/parser": "^5.59.1",
-    "eslint": "^8.39.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.8.8",
-    "ts-node": "^10.9.1",
-    "tsx": "^3.12.6",
-    "typescript": "^5.0.4"
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "*",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
+    "tsx": "^4.0.0",
+    "tsup": "*",
+    "typescript": "^5.0.4",
+    "typescript-eslint": "*",
+    "vitest": "*"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.321.1",
     "@azure/storage-blob": "^12.14.0",
+    "smol-toml": "^1.0.0",
     "yaml": "^2.2.2"
   }
 }

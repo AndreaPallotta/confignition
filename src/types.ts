@@ -1,69 +1,83 @@
-import { S3ClientConfig } from '@aws-sdk/client-s3';
+import type { S3ClientConfig } from '@aws-sdk/client-s3';
+
+// ─── Config content ───────────────────────────────────────────────────────────
 
 /**
- * The content of the configuration file.
+ * The parsed content of a configuration file.
+ * Use the generic `T extends Config` throughout the API for typed access.
  */
 export interface Config {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  [key: string]: unknown;
+}
+
+// ─── File types ───────────────────────────────────────────────────────────────
+
+export const allowedFileTypes = ['dotenv', 'toml', 'yaml', 'yml', 'json', 'ini'] as const;
+export type AllowedFileTypes = (typeof allowedFileTypes)[number] | (string & {});
+
+// ─── Cloud options ────────────────────────────────────────────────────────────
+
+export interface AwsCloudOptions {
+  s3Bucket: string;
+  awsConfig: S3ClientConfig;
+}
+
+export interface AzureCloudOptions {
+  connectionString: string;
+  containerName: string;
 }
 
 /**
- * Interface containing options for the parse() function.
+ * Cloud provider options. Pass exactly one provider.
  */
+export interface ParseCloudOptions {
+  aws?: AwsCloudOptions;
+  azure?: AzureCloudOptions;
+}
+
+// ─── Encryption ───────────────────────────────────────────────────────────────
+
+/**
+ * Options for field-level AES-256-GCM encryption.
+ */
+export interface ParseEncryptionOptions {
+  /** Dot-notation field paths to encrypt/decrypt, e.g. `['database.password', 'api.secret']` */
+  fields: string[];
+  /** 32-byte secret key (or any string — it will be SHA-256 hashed to 32 bytes). */
+  secretKey: string;
+}
+
+// ─── Parse options ────────────────────────────────────────────────────────────
+
 export interface ParseOptions {
+  /** Explicitly set file type instead of inferring from extension. */
   type?: AllowedFileTypes;
+  /** Retrieve file from a cloud provider instead of the local filesystem. */
   fromCloud?: boolean;
+  /** Cloud provider configuration. Required when `fromCloud` is true. */
   cloudConfig?: ParseCloudOptions;
+  /** Watch the file for changes and reload automatically. Does not work with cloud. */
   hotReload?: boolean;
+  /** Debounce interval for hot reload in milliseconds. @default 50 */
   hotReloadInterval?: number;
-  encryptFields?: boolean;
+  /** Field-level encryption options. */
   encryptOptions?: ParseEncryptionOptions;
 }
 
-/**
- * Options to encrypt parse fields.
- */
-export interface ParseEncryptionOptions {
-  fields: string[];
-  secretKey?: string;
-  secret?: string;
-}
+// ─── Update options ───────────────────────────────────────────────────────────
 
-/**
- * Options to parse file from cloud platforms.
- */
-export interface ParseCloudOptions {
-  aws: {
-    s3Bucket: string;
-    awsConfig: S3ClientConfig;
-  };
-  azure: {
-    connectionString: string;
-    containerName: string;
-  };
-}
-
-/**
- * Array of  allowed extensions for the configuration file.
- */
-export const allowedFileTypes = ['dotenv', 'toml', 'yaml', 'yml', 'json', 'ini'] as const;
-
-/**
- * Type grouping the extensions allowed for the configuration file.
- */
-export type AllowedFileTypes = (typeof allowedFileTypes)[number] | string;
-
-/**
- * Options to update configurations.
- */
 export interface UpdateOptions {
+  /** If true, write the config to a new file instead of the current one. */
   createNewFile?: boolean;
   newFileOptions?: {
     path: string;
     type?: AllowedFileTypes;
   };
+  /** If provided, encrypt these fields before writing. */
+  encryptOptions?: ParseEncryptionOptions;
 }
+
+// ─── Internal state ───────────────────────────────────────────────────────────
 
 export interface GlobalState {
   config: Config;
